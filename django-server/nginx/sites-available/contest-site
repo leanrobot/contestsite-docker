@@ -1,0 +1,8 @@
+server {
+	listen 80;
+	listen 443 ssl default_server;
+
+	location /media {
+		alias /root/contestsite/django/static;
+	}
+}
