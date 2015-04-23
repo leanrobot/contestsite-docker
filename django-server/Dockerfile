@@ -1,8 +1,14 @@
 FROM ubuntu:14.04
 MAINTAINER Tom Petit "contact@tompet.it"
-CMD supervisord -n -c /etc/supervisord/supervisord.conf
+CMD supervisord -n -c /etc/supervisor/supervisord.conf
 
 RUN apt-get update -q
+RUN apt-get install -y \
+	nginx \
+	python python-dev python-pip \
+	sqlite3 libsqlite3-dev \
+	supervisor \
+	git
 
 # install development essentials
 WORKDIR /tmp/dev_env
@@ -15,17 +21,10 @@ WORKDIR /root
 # Add the code base from git.
 COPY ssh /root/.ssh
 RUN chmod 700 /root/.ssh/github-deployment.pem
-RUN apt-get install -yq git
 
 RUN ssh-keyscan github.com > /root/.ssh/known_hosts
 #RUN ssh -v git@github.com
 RUN git clone git@github.com:leanrobot/contestsite.git
-
-# Main site config
-RUN apt-get install -y \
-	nginx \
-	python python-dev python-pip \
-	sqlite3 libsqlite3-dev
 
 # set up nginx site
 RUN ln -s nginx /etc/nginx
@@ -43,14 +42,17 @@ RUN pip install -r ~/contestsite/requirements.txt
 # Expose Ports
 EXPOSE 80
 
-# setup Gunicorn ====
-
-# Install Supervisor
-RUN apt-get install -y supervisor
+# Supervisor env setup.
 RUN mkdir -p /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/supervisord.conf
 
 # create socket folder
 RUN mkdir -p gunicorn
 COPY gunicorn_config.py gunicorn/gunicorn_config.py
 
-COPY supervisord.conf /etc/supervisord/supervisord.conf
+# setup log folder
+RUN mkdir -p /root/logs/
+
+# collectstatic for django files.
+WORKDIR /root/contestsite
+RUN python manage.py collectstatic --noinput
