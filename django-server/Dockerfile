@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 MAINTAINER Tom Petit "contact@tompet.it"
-CMD supervisord -n -c /etc/supervisor/supervisord.conf
+CMD /root/docker_entrypoint.sh
 
 RUN apt-get update -q
 RUN apt-get install -y \
@@ -9,6 +9,8 @@ RUN apt-get install -y \
 	sqlite3 libsqlite3-dev \
 	supervisor \
 	git
+
+COPY docker_entrypoint.sh /root/
 
 # install development essentials
 WORKDIR /tmp/dev_env
