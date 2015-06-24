@@ -23,10 +23,11 @@ WORKDIR /root
 # Add the code base from git.
 COPY ssh /root/.ssh
 RUN chmod 700 /root/.ssh/github-deployment.pem
-
 RUN ssh-keyscan github.com > /root/.ssh/known_hosts
-#RUN ssh -v git@github.com
 RUN git clone git@github.com:leanrobot/contestsite.git
+
+# Add local codebase
+#COPY ./code/ /root/contestsite
 
 # set up nginx site
 RUN ln -s nginx /etc/nginx
