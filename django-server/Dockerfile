@@ -24,7 +24,8 @@ WORKDIR /root
 COPY ssh /root/.ssh
 RUN chmod 700 /root/.ssh/github-deployment.pem
 RUN ssh-keyscan github.com > /root/.ssh/known_hosts
-RUN git clone git@github.com:leanrobot/contestsite.git
+RUN git clone https://github.com/leanrobot/contestsite.git
+#RUN git clone git@github.com:leanrobot/contestsite.git
 
 # Add local codebase
 #COPY ./code/ /root/contestsite
